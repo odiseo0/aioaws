@@ -107,7 +107,7 @@ class S3Client:
         return list(chain(*results))
 
     async def upload(
-        self, file_path: str, content: bytes, *, content_type: Optional[str] = None, acl: ACLType = None
+        self, file_path: str, content: bytes, *, content_type: Optional[str] = None, acl: Optional[ACLType] = None
     ) -> None:
         assert not file_path.startswith('/'), 'file_path must not start with /'
         parts = file_path.rsplit('/', 1)
@@ -121,7 +121,7 @@ class S3Client:
             content_type=content_type or 'application/octet-stream',
             size=len(content),
             expires=datetime.utcnow() + timedelta(minutes=30),
-            acl=acl or 'public-read',
+            acl=acl,
         )
         await self._aws_client.raw_post(d['url'], expected_status=204, data=d['fields'], files={'file': content})
 
@@ -194,7 +194,7 @@ class S3Client:
         size: int,
         content_disp: bool = True,
         expires: Optional[datetime] = None,
-        acl: ACLType = 'public-read',
+        acl: Optional[ACLType] = None,
     ) -> Dict[str, Any]:
         """
         https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-post-example.html
@@ -203,12 +203,16 @@ class S3Client:
         assert not path.startswith('/'), 'path must not start with "/"'
         key = path + filename
         policy_conditions = [
-            {'acl': acl},
             {'bucket': self._config.aws_s3_bucket},
             {'key': key},
             {'content-type': content_type},
             ['content-length-range', size, size],
         ]
+
+        acl_field = {}
+        if acl:
+            acl_field = {'ACL': acl}
+            policy_conditions.append({'acl': acl})
 
         content_disp_fields = {}
         if content_disp:
@@ -224,9 +228,9 @@ class S3Client:
         }
         b64_policy = base64.b64encode(json.dumps(policy).encode()).decode()
         fields = {
-            'ACL': acl,
             'Key': key,
             'Content-Type': content_type,
+            **acl_field,
             **content_disp_fields,
             'Policy': b64_policy,
             **self._aws_client.signed_upload_fields(now, b64_policy),
