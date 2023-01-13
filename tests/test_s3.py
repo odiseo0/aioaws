@@ -26,21 +26,22 @@ def test_upload_url_after_overriding_aws_client_endpoint(mocker):
     assert d == {
         'url': 'http://localhost:4766/',
         'fields': {
+            'ACL': 'public-read',
             'Key': 'testing/test.png',
             'Content-Type': 'image/png',
             'Content-Disposition': 'attachment; filename="test.png"',
             'Policy': (
-                'eyJleHBpcmF0aW9uIjogIjIwMzItMDEtMDFUMDA6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAidGVzdGluZy5jb'
-                '20ifSwgeyJrZXkiOiAidGVzdGluZy90ZXN0LnBuZyJ9LCB7ImNvbnRlbnQtdHlwZSI6ICJpbWFnZS9wbmcifSwgWyJjb250ZW50LW'
-                'xlbmd0aC1yYW5nZSIsIDEyMywgMTIzXSwgeyJDb250ZW50LURpc3Bvc2l0aW9uIjogImF0dGFjaG1lbnQ7IGZpbGVuYW1lPVwidGV'
-                'zdC5wbmdcIiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAidGVzdGluZy8yMDMyMDEwMS90ZXN0aW5nL3MzL2F3czRfcmVxdWVzdCJ9'
-                'LCB7IngtYW16LWFsZ29yaXRobSI6ICJBV1M0LUhNQUMtU0hBMjU2In0sIHsieC1hbXotZGF0ZSI6ICIyMDMyMDEwMVQwMDAwMDBaI'
-                'n1dfQ=='
+                'eyJleHBpcmF0aW9uIjogIjIwMzItMDEtMDFUMDA6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQif'
+                'SwgeyJidWNrZXQiOiAidGVzdGluZy5jb20ifSwgeyJrZXkiOiAidGVzdGluZy90ZXN0LnBuZyJ9LCB7ImNvbnRlbnQtdHlwZSI6IC'
+                'JpbWFnZS9wbmcifSwgWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsIDEyMywgMTIzXSwgeyJDb250ZW50LURpc3Bvc2l0aW9uIjogImF'
+                '0dGFjaG1lbnQ7IGZpbGVuYW1lPVwidGVzdC5wbmdcIiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAidGVzdGluZy8yMDMyMDEwMS90'
+                'ZXN0aW5nL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWFsZ29yaXRobSI6ICJBV1M0LUhNQUMtU0hBMjU2In0sIHsieC1hbXotZ'
+                'GF0ZSI6ICIyMDMyMDEwMVQwMDAwMDBaIn1dfQ=='
             ),
             'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
             'X-Amz-Credential': 'testing/20320101/testing/s3/aws4_request',
             'X-Amz-Date': '20320101T000000Z',
-            'X-Amz-Signature': '6f03af4c50aacb313ceb038743ca035bc2da2dc3bf9d1289f5cb946c6c940a60',
+            'X-Amz-Signature': '72099f1ac94cb382f76f234fb779f5f0f6c3970dc1e3eee7fda4b0b460b0d4ce',
         },
     }
 
@@ -54,21 +55,22 @@ def test_upload_url(mocker):
     assert d == {
         'url': 'https://testing.com/',
         'fields': {
+            'ACL': 'public-read',
             'Key': 'testing/test.png',
             'Content-Type': 'image/png',
             'Content-Disposition': 'attachment; filename="test.png"',
             'Policy': (
-                'eyJleHBpcmF0aW9uIjogIjIwMzItMDEtMDFUMDA6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAidGVzdGluZy5jb'
-                '20ifSwgeyJrZXkiOiAidGVzdGluZy90ZXN0LnBuZyJ9LCB7ImNvbnRlbnQtdHlwZSI6ICJpbWFnZS9wbmcifSwgWyJjb250ZW50LW'
-                'xlbmd0aC1yYW5nZSIsIDEyMywgMTIzXSwgeyJDb250ZW50LURpc3Bvc2l0aW9uIjogImF0dGFjaG1lbnQ7IGZpbGVuYW1lPVwidGV'
-                'zdC5wbmdcIiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAidGVzdGluZy8yMDMyMDEwMS90ZXN0aW5nL3MzL2F3czRfcmVxdWVzdCJ9'
-                'LCB7IngtYW16LWFsZ29yaXRobSI6ICJBV1M0LUhNQUMtU0hBMjU2In0sIHsieC1hbXotZGF0ZSI6ICIyMDMyMDEwMVQwMDAwMDBaI'
-                'n1dfQ=='
+                'eyJleHBpcmF0aW9uIjogIjIwMzItMDEtMDFUMDA6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQif'
+                'SwgeyJidWNrZXQiOiAidGVzdGluZy5jb20ifSwgeyJrZXkiOiAidGVzdGluZy90ZXN0LnBuZyJ9LCB7ImNvbnRlbnQtdHlwZSI6IC'
+                'JpbWFnZS9wbmcifSwgWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsIDEyMywgMTIzXSwgeyJDb250ZW50LURpc3Bvc2l0aW9uIjogImF'
+                '0dGFjaG1lbnQ7IGZpbGVuYW1lPVwidGVzdC5wbmdcIiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAidGVzdGluZy8yMDMyMDEwMS90'
+                'ZXN0aW5nL3MzL2F3czRfcmVxdWVzdCJ9LCB7IngtYW16LWFsZ29yaXRobSI6ICJBV1M0LUhNQUMtU0hBMjU2In0sIHsieC1hbXotZ'
+                'GF0ZSI6ICIyMDMyMDEwMVQwMDAwMDBaIn1dfQ=='
             ),
             'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
             'X-Amz-Credential': 'testing/20320101/testing/s3/aws4_request',
             'X-Amz-Date': '20320101T000000Z',
-            'X-Amz-Signature': '6f03af4c50aacb313ceb038743ca035bc2da2dc3bf9d1289f5cb946c6c940a60',
+            'X-Amz-Signature': '72099f1ac94cb382f76f234fb779f5f0f6c3970dc1e3eee7fda4b0b460b0d4ce',
         },
     }
 
@@ -87,19 +89,20 @@ def test_upload_url_no_content_disp(mocker):
     assert d == {
         'url': 'https://testing-bucket.s3.testing-region.amazonaws.com/',
         'fields': {
+            'ACL': 'public-read',
             'Key': 'testing/test.png',
             'Content-Type': 'image/png',
             'Policy': (
-                'eyJleHBpcmF0aW9uIjogIjIwMzItMDEtMDFUMDA6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJidWNrZXQiOiAidGVzdGluZy1id'
-                'WNrZXQifSwgeyJrZXkiOiAidGVzdGluZy90ZXN0LnBuZyJ9LCB7ImNvbnRlbnQtdHlwZSI6ICJpbWFnZS9wbmcifSwgWyJjb250ZW'
-                '50LWxlbmd0aC1yYW5nZSIsIDEyMywgMTIzXSwgeyJ4LWFtei1jcmVkZW50aWFsIjogInRlc3RpbmctYWNjZXNzLWtleS8yMDMyMDE'
-                'wMS90ZXN0aW5nLXJlZ2lvbi9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9'
-                'LCB7IngtYW16LWRhdGUiOiAiMjAzMjAxMDFUMDAwMDAwWiJ9XX0='
+                'eyJleHBpcmF0aW9uIjogIjIwMzItMDEtMDFUMDA6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQif'
+                'SwgeyJidWNrZXQiOiAidGVzdGluZy1idWNrZXQifSwgeyJrZXkiOiAidGVzdGluZy90ZXN0LnBuZyJ9LCB7ImNvbnRlbnQtdHlwZS'
+                'I6ICJpbWFnZS9wbmcifSwgWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsIDEyMywgMTIzXSwgeyJ4LWFtei1jcmVkZW50aWFsIjogInR'
+                'lc3RpbmctYWNjZXNzLWtleS8yMDMyMDEwMS90ZXN0aW5nLXJlZ2lvbi9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1hbGdvcml0'
+                'aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWRhdGUiOiAiMjAzMjAxMDFUMDAwMDAwWiJ9XX0='
             ),
             'X-Amz-Algorithm': 'AWS4-HMAC-SHA256',
             'X-Amz-Credential': 'testing-access-key/20320101/testing-region/s3/aws4_request',
             'X-Amz-Date': '20320101T000000Z',
-            'X-Amz-Signature': 'd1a0cd63d314f846291b9046ef0c253923ebff4af52bb3097558373ebf76bdb2',
+            'X-Amz-Signature': 'e143e88e33faef0261eab521607844d89ca42174bb953c31cc84428f7588ecfd',
         },
     }
 

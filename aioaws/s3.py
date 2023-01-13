@@ -26,13 +26,13 @@ xmlns = 'http://s3.amazonaws.com/doc/2006-03-01/'
 xmlns_re = re.compile(f' xmlns="{re.escape(xmlns)}"'.encode())
 
 ACLType = Union[
-    Literal["private"],
-    Literal["public-read"],
-    Literal["public-read-write"],
-    Literal["authenticated-read"],
-    Literal["aws-exec-read"],
-    Literal["bucket-owner-read"],
-    Literal["bucket-owner-full-control"],
+    Literal['private'],
+    Literal['public-read'],
+    Literal['public-read-write'],
+    Literal['authenticated-read'],
+    Literal['aws-exec-read'],
+    Literal['bucket-owner-read'],
+    Literal['bucket-owner-full-control'],
 ]
 
 
@@ -194,7 +194,7 @@ class S3Client:
         size: int,
         content_disp: bool = True,
         expires: Optional[datetime] = None,
-        acl: ACLType = "public-read",
+        acl: ACLType = 'public-read',
     ) -> Dict[str, Any]:
         """
         https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-post-example.html
