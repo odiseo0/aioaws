@@ -139,6 +139,13 @@ def test_upload_url_with_acl(mocker):
 
 
 @pytest.mark.asyncio
+async def test_head(client: AsyncClient, aws: DummyServer):
+    s3 = S3Client(client, S3Config("testing", "testing", "testing", "testing"))
+    response = await s3.head("testing.txt")
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_list(client: AsyncClient):
     s3 = S3Client(client, S3Config('testing', 'testing', 'testing', 'testing'))
     files = [f async for f in s3.list()]

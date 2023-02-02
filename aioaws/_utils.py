@@ -4,8 +4,10 @@ from typing import TYPE_CHECKING, Any, Coroutine, Iterable, List, Optional
 
 from httpx import Response
 
+
 if TYPE_CHECKING:
     from ._types import ConfigProtocol
+
 
 __all__ = 'get_config_attr', 'to_unix_s', 'utcnow', 'ManyTasks', 'pretty_xml', 'pretty_response'
 

@@ -4,6 +4,7 @@ from email.header import decode_header as _decode_header
 from typing import Any, Dict, Iterable, Optional
 from uuid import uuid4
 
+
 __all__ = 'ses_email_data', 'ses_send_response'
 
 

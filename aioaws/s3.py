@@ -5,7 +5,16 @@ import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from itertools import chain
-from typing import TYPE_CHECKING, Any, AsyncIterable, Dict, List, Literal, Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AsyncIterable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Union,
+)
 from xml.etree import ElementTree
 
 from httpx import URL, AsyncClient
@@ -14,8 +23,10 @@ from pydantic import BaseModel, validator
 from ._utils import ManyTasks, pretty_xml, utcnow
 from .core import AwsClient, RequestError
 
+
 if TYPE_CHECKING:
     from ._types import S3ConfigProtocol
+
 
 __all__ = 'S3Client', 'S3Config', 'S3File'
 
@@ -70,6 +81,14 @@ class S3Client:
         self._aws_client = AwsClient(http_client, config, 's3')
         self._config = config
 
+    async def head(self, key: str):
+        """
+        Retrieve metadata from an object.
+
+        https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html
+        """
+        return await self._aws_client.head(f"/{key}")
+
     async def list(self, prefix: Optional[str] = None) -> AsyncIterable[S3File]:
         """
         List S3 files with the given prefix.
@@ -101,7 +120,7 @@ class S3Client:
         tasks = ManyTasks()
         chunk_size = 1000
         for i in range(0, len(files), chunk_size):
-            tasks.add(self._delete_1000_files(*files[i : i + chunk_size]))
+            tasks.add(self._delete_1000_files(*files[i : i + chunk_size]))  # noqa: E203
 
         results = await tasks.finish()
         return list(chain(*results))

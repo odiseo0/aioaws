@@ -12,8 +12,10 @@ from httpx import URL, AsyncClient, Auth, Request, Response
 
 from ._utils import get_config_attr, pretty_xml, utcnow
 
+
 if TYPE_CHECKING:
     from ._types import ConfigProtocol
+
 
 __all__ = 'AwsClient', 'RequestError'
 logger = logging.getLogger('aioaws.core')
@@ -48,6 +50,7 @@ class AwsClient:
                 else:
                     # see https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
                     self.host = f'{bucket}.s3.{self.region}.amazonaws.com'
+
         self.schema = 'https'
 
         self._auth = AWSv4Auth(
@@ -63,6 +66,9 @@ class AwsClient:
 
     async def get(self, path: str = '', *, params: Optional[Dict[str, Any]] = None) -> Response:
         return await self.request('GET', path=path, params=params)
+
+    async def head(self, path: str = '', *, params: Optional[Dict[str, Any]] = None) -> Response:
+        return await self.request('HEAD', path=path, params=params)
 
     async def raw_post(
         self,
@@ -93,7 +99,7 @@ class AwsClient:
 
     async def request(
         self,
-        method: Literal['GET', 'POST'],
+        method: Literal['GET', 'POST', 'HEAD'],
         *,
         path: str,
         params: Optional[Dict[str, Any]],
@@ -107,10 +113,13 @@ class AwsClient:
             content=data,
             headers=self._auth.auth_headers(method, url, data=data, content_type=content_type),
         )
+
         if r.status_code != 200:
-            # from ._utils import pretty_response
-            # pretty_response(r)
+            from ._utils import pretty_response
+
+            pretty_response(r)
             raise RequestError(r)
+
         return r
 
     def add_signed_download_params(self, method: Literal['GET', 'POST'], url: URL, expires: int = 86400) -> URL:
@@ -160,7 +169,7 @@ class AWSv4Auth:
 
     def auth_headers(
         self,
-        method: Literal['GET', 'POST'],
+        method: Literal['GET', 'POST', 'HEAD'],
         url: URL,
         *,
         data: Optional[bytes] = None,

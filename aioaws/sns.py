@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from httpx import AsyncClient
 from pydantic import BaseModel, Field, HttpUrl, ValidationError, validator
 
+
 __all__ = 'SnsWebhookError', 'SnsPayload', 'verify_webhook'
 logger = logging.getLogger('aioaws.sns')
 

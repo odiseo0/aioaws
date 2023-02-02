@@ -10,7 +10,17 @@ from email.message import EmailMessage
 from email.mime.base import MIMEBase
 from email.utils import formataddr
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Literal, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+)
 from urllib.parse import urlencode
 
 import aiofiles
@@ -20,8 +30,10 @@ from pydantic.datetime_parse import parse_datetime
 from . import sns
 from .core import AwsClient
 
+
 if TYPE_CHECKING:
     from ._types import ConfigProtocol
+
 
 __all__ = 'SesAttachment', 'SesClient', 'SesConfig', 'SesRecipient', 'SesWebhookInfo'
 logger = logging.getLogger('aioaws.ses')
@@ -82,7 +94,6 @@ class SesClient:
         message_tags: Optional[Dict[str, Any]] = None,
         smtp_headers: Optional[Dict[str, str]] = None,
     ) -> str:
-
         email_msg = EmailMessage()
         email_msg['Subject'] = subject
         e_from_recipient = as_recipient(e_from)
