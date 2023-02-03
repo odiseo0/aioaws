@@ -17,7 +17,7 @@ from typing import (
 )
 from xml.etree import ElementTree
 
-from httpx import URL, AsyncClient
+from httpx import URL, AsyncClient, Response
 from pydantic import BaseModel, validator
 
 from ._utils import ManyTasks, pretty_xml, utcnow
@@ -81,13 +81,18 @@ class S3Client:
         self._aws_client = AwsClient(http_client, config, 's3')
         self._config = config
 
-    async def head(self, key: str):
+    async def head(self, key: str) -> Union[Response, Literal[False]]:
         """
         Retrieve metadata from an object.
 
         https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html
         """
-        return await self._aws_client.head(f"/{key}")
+        try:
+            response = await self._aws_client.head(f"/{key}")
+        except RequestError:
+            return False
+
+        return response
 
     async def list(self, prefix: Optional[str] = None) -> AsyncIterable[S3File]:
         """
