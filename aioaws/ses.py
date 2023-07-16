@@ -25,10 +25,10 @@ from urllib.parse import urlencode
 
 import aiofiles
 from httpx import AsyncClient
-from pydantic.datetime_parse import parse_datetime
 
 from . import sns
 from .core import AwsClient
+from .parse_datetime import parse_datetime
 
 
 if TYPE_CHECKING:

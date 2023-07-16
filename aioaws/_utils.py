@@ -39,6 +39,10 @@ def utcnow() -> datetime:
     return datetime.utcnow().replace(tzinfo=timezone.utc)
 
 
+def alias_generator(string: str) -> str:
+    return ''.join(word.capitalize() for word in string.split('_'))
+
+
 class ManyTasks:
     """
     Simply utility to start many tasks without awaiting them, then wait for them all to finish

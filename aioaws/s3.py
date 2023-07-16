@@ -18,7 +18,7 @@ from typing import (
 from xml.etree import ElementTree
 
 from httpx import URL, AsyncClient, Response
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from ._utils import ManyTasks, pretty_xml, utcnow
 from .core import AwsClient, RequestError
@@ -47,6 +47,10 @@ ACLType = Union[
 ]
 
 
+def alias_generator(string: str) -> str:
+    return ''.join(word.capitalize() for word in string.split('_'))
+
+
 @dataclass
 class S3Config:
     aws_access_key: str
@@ -64,14 +68,11 @@ class S3File(BaseModel):
     e_tag: str
     storage_class: str
 
-    @validator('e_tag')
+    model_config = ConfigDict(alias_generator=alias_generator)
+
+    @field_validator('e_tag', mode="before")
     def set_ts_now(cls, v: str) -> str:
         return v.strip('"')
-
-    class Config:
-        @classmethod
-        def alias_generator(cls, string: str) -> str:
-            return ''.join(word.capitalize() for word in string.split('_'))
 
 
 class S3Client:
