@@ -69,7 +69,6 @@ exclude_lines = [
 line-length = 120
 extend-select = ["Q"]
 flake8-quotes = {inline-quotes = "single", multiline-quotes = "double"}
-update-check = false
 
 [tool.black]
 color = true

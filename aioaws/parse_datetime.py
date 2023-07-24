@@ -23,6 +23,7 @@ from typing import Dict, Optional, Type, Union
 
 from . import errors
 
+
 date_expr = r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})'
 time_expr = (
     r'(?P<hour>\d{1,2}):(?P<minute>\d{1,2})'
