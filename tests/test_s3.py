@@ -1,11 +1,11 @@
 import asyncio
 import secrets
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from dirty_equals import IsNow, IsStr
-from foxglove.test_server import DummyServer
-from httpx import AsyncClient
+from foxglove.testing import DummyServer
+from httpx2 import AsyncClient, Limits
 
 from aioaws.core import RequestError
 from aioaws.s3 import S3Client, S3Config, S3File, to_key
@@ -143,9 +143,9 @@ async def test_list(client: AsyncClient):
     s3 = S3Client(client, S3Config('testing', 'testing', 'testing', 'testing'))
     files = [f async for f in s3.list()]
     assert len(files) == 3
-    assert files[0].dict() == dict(
+    assert files[0].model_dump() == dict(
         key='/foo.html',
-        last_modified=datetime(2032, 1, 1, 12, 34, 56, tzinfo=timezone.utc),
+        last_modified=datetime(2032, 1, 1, 12, 34, 56, tzinfo=UTC),
         size=123,
         e_tag='aaa',
         storage_class='STANDARD',
@@ -203,7 +203,7 @@ async def test_list_bad(client: AsyncClient):
 
 def test_to_key():
     assert to_key('foobar') == 'foobar'
-    assert to_key(S3File.construct(key='spam')) == 'spam'
+    assert to_key(S3File.model_construct(key='spam')) == 'spam'
     with pytest.raises(TypeError, match='must be a string or S3File object'):
         to_key(123)
 
@@ -258,31 +258,31 @@ def test_aws4_upload_signature(client: AsyncClient, mocker):
 @pytest.mark.asyncio
 async def test_real_upload(real_aws: AWS):
     async with AsyncClient(timeout=30) as client:
-        s3 = S3Client(client, S3Config(real_aws.access_key, real_aws.secret_key, 'us-east-1', 'aioaws-testing'))
+        s3 = S3Client(client, S3Config(real_aws.access_key, real_aws.secret_key, 'us-east-1', 'aioaws-testing2'))
 
         path = f'{run_prefix}/testing/test.txt'
         await s3.upload(path, b'this is a test')
 
         try:
-            files = [f.dict() async for f in s3.list(f'{run_prefix}/')]
+            files = [f.model_dump() async for f in s3.list(f'{run_prefix}/')]
             # debug(files)
             assert len(files) == 1
             assert files[0] == {
                 'key': path,
-                'last_modified': IsNow(delta=10, tz='utc'),
+                'last_modified': IsNow(delta=10, tz='UTC'),
                 'size': 14,
                 'e_tag': '54b0c58c7ce9f2a8b551351102ee0938',
                 'storage_class': 'STANDARD',
             }
         finally:
             assert await s3.delete(path) == [path]
-            assert [f.dict() async for f in s3.list(f'{run_prefix}/')] == []
+            assert [f.model_dump() async for f in s3.list(f'{run_prefix}/')] == []
 
 
 @pytest.mark.asyncio
 async def test_real_download_link(real_aws: AWS):
     async with AsyncClient(timeout=30) as client:
-        s3 = S3Client(client, S3Config(real_aws.access_key, real_aws.secret_key, 'us-east-1', 'aioaws-testing'))
+        s3 = S3Client(client, S3Config(real_aws.access_key, real_aws.secret_key, 'us-east-1', 'aioaws-testing2'))
 
         await s3.upload(f'{run_prefix}/foobar.txt', b'hello', content_type='text/html')
 
@@ -299,8 +299,9 @@ async def test_real_download_link(real_aws: AWS):
 
 @pytest.mark.asyncio
 async def test_real_many(real_aws: AWS):
-    async with AsyncClient(timeout=30) as client:
-        s3 = S3Client(client, S3Config(real_aws.access_key, real_aws.secret_key, 'us-east-1', 'aioaws-testing'))
+    # opening ~50 TLS connections to S3 at once occasionally fails mid-handshake, so cap concurrent connections
+    async with AsyncClient(timeout=30, limits=Limits(max_connections=10)) as client:
+        s3 = S3Client(client, S3Config(real_aws.access_key, real_aws.secret_key, 'us-east-1', 'aioaws-testing2'))
 
         # upload many files
         await asyncio.gather(*[s3.upload(f'{run_prefix}/f_{i}.txt', f'file {i}'.encode()) for i in range(51)])

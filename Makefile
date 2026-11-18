@@ -1,57 +1,62 @@
 .DEFAULT_GOAL := all
-isort = isort aioaws tests
-black = black aioaws tests
-ruff = ruff aioaws tests
+
+.PHONY: .uv
+.uv:
+	@uv --version || echo 'Please install uv: https://docs.astral.sh/uv/getting-started/installation/'
 
 .PHONY: install
-install:
-	python -m pip install -U setuptools pip
-	pip install -U -r requirements.txt
-	pip install -U -r tests/requirements-linting.txt
-	pip install -e .
+install: .uv ## Install python dependencies and prek hooks
+	uv sync --frozen
+	uvx prek install --install-hooks
 
 .PHONY: format
-format:
-	$(isort)
-	$(black)
-	$(ruff) --fix --exit-zero
+format: ## Format Python code
+	uv run ruff format
+	uv run ruff check --fix --fix-only
 
 .PHONY: lint
-lint:
-	$(ruff)
-	$(isort) --check-only --df
-	$(black) --check --diff
-
-.PHONY: mypy
-mypy:
-	mypy --version
-	mypy aioaws
+lint: ## Lint Python code with ruff and basedpyright (strict)
+	uv run ruff format --check
+	uv run ruff check
+	uv run basedpyright
 
 .PHONY: test
-test:
-	coverage run -m pytest
+test: ## Run tests
+	uv run coverage run -m pytest
 
 .PHONY: testcov
-testcov: test
+testcov: test ## Run tests with coverage and build HTML report
 	@echo "building coverage html"
-	@coverage html
+	@uv run coverage html
 
 .PHONY: all
-all: lint mypy testcov
+all: lint testcov ## Run all checks and tests
 
 .PHONY: clean
-clean:
+clean: ## Clean up build artifacts
 	rm -rf `find . -name __pycache__`
 	rm -f `find . -type f -name '*.py[co]' `
 	rm -f `find . -type f -name '*~' `
 	rm -f `find . -type f -name '.*~' `
 	rm -rf .cache
 	rm -rf .pytest_cache
-	rm -rf .mypy_cache
 	rm -rf htmlcov
 	rm -rf *.egg-info
 	rm -f .coverage
 	rm -f .coverage.*
 	rm -rf build
 	rm -rf dist
-	rm -rf site
+
+# (must stay last!)
+.PHONY: help
+help: ## Show this help (usage: make help)
+	@echo "Usage: make [recipe]"
+	@echo "Recipes:"
+	@awk '/^[a-zA-Z0-9_-]+:.*?##/ { \
+	    helpMessage = match($$0, /## (.*)/); \
+	        if (helpMessage) { \
+	            recipe = $$1; \
+	            sub(/:/, "", recipe); \
+	            printf "  \033[36mmake %-20s\033[0m %s\n", recipe, substr($$0, RSTART + 3, RLENGTH); \
+	    } \
+	}' $(MAKEFILE_LIST)

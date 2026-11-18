@@ -1,16 +1,17 @@
 import asyncio
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Coroutine, Iterable, List, Optional
+from collections.abc import Coroutine, Iterable
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
-from httpx import Response
+from httpx2 import Response
 
 if TYPE_CHECKING:
     from ._types import ConfigProtocol
 
-__all__ = 'get_config_attr', 'to_unix_s', 'utcnow', 'ManyTasks', 'pretty_xml', 'pretty_response'
+__all__ = 'ManyTasks', 'get_config_attr', 'pretty_response', 'pretty_xml', 'utcnow'
 
 EPOCH = datetime(1970, 1, 1)
-EPOCH_TZ = EPOCH.replace(tzinfo=timezone.utc)
+EPOCH_TZ = EPOCH.replace(tzinfo=UTC)
 
 
 def get_config_attr(config: 'ConfigProtocol', name: str) -> str:
@@ -25,16 +26,8 @@ def get_config_attr(config: 'ConfigProtocol', name: str) -> str:
         raise TypeError(f'config.{name} must be a string not {s.__class__.__name__}')
 
 
-def to_unix_s(dt: datetime) -> int:
-    if dt.utcoffset() is None:
-        diff = dt - EPOCH
-    else:
-        diff = dt - EPOCH_TZ
-    return int(round(diff.total_seconds()))
-
-
 def utcnow() -> datetime:
-    return datetime.utcnow().replace(tzinfo=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 class ManyTasks:
@@ -42,12 +35,12 @@ class ManyTasks:
     Simply utility to start many tasks without awaiting them, then wait for them all to finish
     """
 
-    __slots__ = '_tasks'
+    __slots__ = ('_tasks',)
 
     def __init__(self) -> None:
-        self._tasks: List[asyncio.Task[Any]] = []
+        self._tasks: list[asyncio.Task[Any]] = []
 
-    def add(self, coroutine: Coroutine[Any, Any, List[str]], *, name: Optional[str] = None) -> None:
+    def add(self, coroutine: Coroutine[Any, Any, list[str]], *, name: str | None = None) -> None:
         task = asyncio.create_task(coroutine, name=name)
         self._tasks.append(task)
 
@@ -67,7 +60,13 @@ def pretty_xml(response_xml: bytes) -> str:
 
 
 def pretty_response(r: Response) -> None:  # pragma: no cover
-    from devtools import debug
+    try:
+        from devtools import debug
+    except ImportError:
+        from pprint import pprint
+
+        def debug(**kwargs: Any) -> None:
+            pprint(kwargs)
 
     debug(
         status=r.status_code,
